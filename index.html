@@ -20,10 +20,12 @@
     <!-- Optional theme -->
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 
     <style>
 
@@ -69,6 +71,9 @@
             font-size: 80%;
         }
 
+        .arel_notes_wrapper {
+            max-width: 800px;
+        }
 
     </style>
 
@@ -89,18 +94,81 @@
 </div>
 
 
-<div class="container">
+<div class="arel_notes_wrapper container">
 
 
     <h1 class="page-heading">AREL Rails 4 Notes</h1>
 
     <p>AREL is a database agnostic object and collection modelling toolkit</p>
 
+    <p>When you need more than .where(), you don't need to write SQL because you can use AREL</p>
+
+    <p>The example I'm thinking about is when I want a user a list of Things, the Pseudo query might
+        be something along the lines of:</p>
+
+<pre class="prettyprint lang-sql">
+SELECT all the posts which are public or were authored by the current user
+</pre>
+
+    <p>I can't see a way to do this using .where({hash}) and I'd rather avoid putting a SQL statement directly:</p>
+
+<pre class="prettyprint lang-rb">
+class PostsController
+
+    def index
+        @posts = Post.where("author = ? OR public = true", current_user)
+    end
+
+end
+</pre>
+
+    <p>This is where AREL can help!</p>
+
+    <p>I think it's a good idea to encapsulate the logic into the model class, and I like the idea of making this into
+        a scope so that we can use additional filtering and pagination later on without refactoring the query</p>
+
+<pre class="prettyprint lang-rb">
+
+class Post
+
+  def self.visible_to user
+    self.where self.arel_visible_to(user)
+  end
+
+private
+
+  def self.arel_owned_by user
+    arel_table[:author].eq(user)
+  end
+
+  def self.arel_public
+    arel_table[:public].eq(true)
+  end
+
+  def self.arel_visible_to user
+    self.arel_owned_by(user).or(self.arel_public)
+  end
+
+end
+
+
+class PostsController
+
+    def index
+        @posts = Post.visible_to current_user
+    end
+
+end
+</pre>
+
+
     <div class="panel panel-default">
         <div class="panel-heading">Resources</div>
         <div class="panel-body">
             <ul>
                 <li><a href="https://github.com/rails/arel">rails/arel</a></li>
+                <li><a href="http://robots.thoughtbot.com/using-arel-to-compose-sql-queries">thoughtbot - AREL for SQL
+                    Queries</a></li>
             </ul>
         </div>
     </div>
@@ -114,7 +182,7 @@
 
 <div id="footer">
     <div class="container">
-        <p class="text-muted"><a href="https://github.com/stujo/javascript_notes/issues">Got a bug or a suggestion for
+        <p class="text-muted"><a href="https://github.com/stujo/arel_notes/issues">Got a bug or a suggestion for
             an improvement?</a></p>
     </div>
 </div>

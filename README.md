@@ -1,4 +1,4 @@
-AREL Rails 4 Notes
+AREL Ruby on Rails 4 Example Tutorial Notes
 ====================
 
 AREL is a database agnostic object and collection modelling toolkit

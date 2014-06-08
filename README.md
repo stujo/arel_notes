@@ -97,6 +97,10 @@ Then we get something nice like this:
     Rendered posts/index.html.erb within layouts/application (21.0ms)
     Completed 200 OK in 182ms (Views: 142.7ms | ActiveRecord: 4.1ms)
 
+#Sample Application
+
+The full sample app is here:
+[https://github.com/stujo/arel_notes/tree/master/postings](https://github.com/stujo/arel_notes/tree/master/postings)
 
 #Resources
 
